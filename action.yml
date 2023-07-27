@@ -1,0 +1,65 @@
+# action.yml
+name: "Upload config data"
+description: "Upload config data to Devops Config"
+inputs:
+  sn_instance:
+    description: "ServiceNow Instance"
+    required: true
+  sn_user:
+    description: "ServiceNow Username"
+    reqired: true
+  sn_password:
+    description: "ServiceNow Password"
+    required: true
+  application:
+    description: "Devops Config Application"
+    required: true
+  target:
+    description: "Devops Config object against which to upload (component|collection|deployable)"
+    required: true
+  target_name:
+    description: "Name of the collection or deployable against which to upload"
+    required: false
+  file_name:
+    description: "Name of file to upload"
+    required: true
+  data_format:
+    description: "Format of the file to upload"
+    required: true
+  auto_validate:
+    description: "Validate config data after upload (true|false)"
+    required: true
+    default: true
+  publish_option:
+    description: "Publish after successfull validation"
+    required: true
+    default: "publish_valid"
+  name_path:
+    description: "Path to upload against in the data model"
+    required: false
+  changeset:
+    description: "Devops Config Changeset number"
+    required: false
+outputs:
+  changeset:
+    description: "Devops Config Changeset"
+  validation:
+    description: "Validation status"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.sn_instance }}
+    - ${{ inputs.sn_user }}
+    - ${{ inputs.sn_password }}
+    - ${{ inputs.application }}
+    - ${{ inputs.target }}
+    - ${{ inputs.target_name }}
+    - ${{ inputs.file_name }}
+    - ${{ inputs.data_format }}
+    - ${{ inputs.auto_validate }}
+    - ${{ inputs.publish_option }}
+    - ${{ inputs.name_path }}
+    - ${{ inputs.changeset }}
+    
+    
