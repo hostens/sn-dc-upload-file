@@ -24,14 +24,14 @@ inputs:
     description: "Name of file to upload"
     required: true
   data_format:
-    description: "Format of the file to upload"
+    description: "Format of the file to upload (properties|ini|json|yml|xml)"
     required: true
   auto_validate:
     description: "Validate config data after upload (true|false)"
     required: true
     default: true
   publish_option:
-    description: "Publish after successfull validation"
+    description: "Publish after successfull validation (publish_none|publish_valid)"
     required: true
     default: "publish_valid"
   name_path:
