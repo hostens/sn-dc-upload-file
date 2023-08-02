@@ -17,24 +17,28 @@ inputs:
   target:
     description: "Devops Config object against which to upload (component|collection|deployable)"
     required: true
-  target_name:
+  target-name:
     description: "Name of the collection or deployable against which to upload"
     required: false
-  file_name:
-    description: "Name of file to upload"
+  filename:
+    description: "Name of the file to upload"
     required: true
-  data_format:
-    description: "Format of the file to upload (properties|ini|json|yml|xml)"
+  data-format:
+    description: "Format of the file to upload"
     required: true
-  auto_validate:
+  auto-validate:
     description: "Validate config data after upload (true|false)"
     required: true
     default: true
-  publish_option:
-    description: "Publish after successfull validation (publish_none|publish_valid)"
+  publish-option:
+    description: "Publish after successfull validation"
     required: true
     default: "publish_valid"
-  name_path:
+  auto-delete:
+    description: "Delete content that is not part of the upload payload"
+    required: false
+    default: false
+  name-path:
     description: "Path to upload against in the data model"
     required: false
   changeset:
@@ -54,12 +58,11 @@ runs:
     - ${{ inputs.devops-integration-user-password }}
     - ${{ inputs.application }}
     - ${{ inputs.target }}
-    - ${{ inputs.target_name }}
-    - ${{ inputs.file_name }}
-    - ${{ inputs.data_format }}
-    - ${{ inputs.auto_validate }}
-    - ${{ inputs.publish_option }}
-    - ${{ inputs.name_path }}
+    - ${{ inputs.target-name }}
+    - ${{ inputs.filename }}
+    - ${{ inputs.data-format }}
+    - ${{ inputs.auto-validate }}
+    - ${{ inputs.publish-option }}
+    - ${{ inputs.name-path }}
     - ${{ inputs.changeset }}
-    
-    
+    - ${{ inputs.auto-delete }}
