@@ -8,8 +8,7 @@ function check_upload_status()
 
   counter=0
 
-  while [[ ${counter} -lt 120 ]] && [[ ${state} != "completed" ]]; do
-    counter=$((counter+1))
+  while [[ ${counter} -lt 30 ]] && [[ ${state} != "completed" ]]; do
     response=$(curl -s -X GET ${request_url} -u ${sn_user}:${sn_password})
     echo ${response}
     state=$(echo ${response}|jq -r ".result.state")
