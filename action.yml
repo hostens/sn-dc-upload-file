@@ -2,13 +2,13 @@
 name: "Upload config data"
 description: "Upload config data to Devops Config"
 inputs:
-  sn_instance:
+  instance-url:
     description: "ServiceNow Instance"
     required: true
-  sn_user:
+  devops-integration-user-name:
     description: "ServiceNow Username"
     reqired: true
-  sn_password:
+  devops-integration-user-password:
     description: "ServiceNow Password"
     required: true
   application:
@@ -49,9 +49,9 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - ${{ inputs.sn_instance }}
-    - ${{ inputs.sn_user }}
-    - ${{ inputs.sn_password }}
+    - ${{ inputs.instance-url }}
+    - ${{ inputs.devops-integration-user-name }}
+    - ${{ inputs.devops-integration-user-password }}
     - ${{ inputs.application }}
     - ${{ inputs.target }}
     - ${{ inputs.target_name }}
