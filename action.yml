@@ -44,11 +44,16 @@ inputs:
   changeset:
     description: "Devops Config Changeset number"
     required: false
+  deployable:
+    description: "Name of the deployable against which to get the snapshot"
+    required: false
 outputs:
   changeset:
     description: "Devops Config Changeset"
   validation:
     description: "Validation status"
+  publish:
+    description: "Publish status"
 runs:
   using: "docker"
   image: "Dockerfile"
@@ -66,3 +71,4 @@ runs:
     - ${{ inputs.name-path }}
     - ${{ inputs.changeset }}
     - ${{ inputs.auto-delete }}
+    - ${{ inputs.deployable }}

@@ -25,51 +25,45 @@ function check_upload_status()
 
   changeset=$(echo ${response}|jq -r ".result.output.number")
   echo "changeset=${changeset}" >> $GITHUB_OUTPUT
-  get_snapshot_validation_status ${changeset} $2
+  get_snapshot_validation_status ${changeset}
 }
 
 function get_snapshot_validation_status()
 {
-  request_url="${sn_instance}/api/now/table/sn_cdm_snapshot?sysparm_query=changeset_id.number=$1"
+  request_url="${sn_instance}/api/now/table/sn_cdm_snapshot?sysparm_query=cdm_deployable_id.name%3D${deployable}%5Echangeset_id.number%3D$1"
   response=$(curl -s -X GET ${request_url} -u ${sn_user}:${sn_password})
   status="not_validated"
   errors_found=0
-  declare -A errors
+  declare -a errors
 
   while [[ ${status} == "not_validated" ]]; do
     status="validated"
     response=$(curl -s -X GET ${request_url} -u ${sn_user}:${sn_password})
-    for row in $(echo ${response}|jq -r ".result[]| @base64"); do
-      _jq() {
-        echo ${row}| base64 --decode | jq -r ${1}
-      }
-      validation_status=$(_jq ".validation")
-      snapshot=$(_jq ".name")
+    validation_status=$(echo ${response}|jq -r ".result[].validation")
+    snapshot=$(echo ${response}|jq -r ".result[].number")
+    publish_status=$(echo ${response}|jq -r ".result[].published")
 
-      echo "Validation status for snapshot ${snapshot}: ${validation_status}"
-      if [[ ${validation_status} == "not_validated" ]] || [[ ${validation_status} == "in_progress" ]]; then
-        status="not_validated"
-      elif [[ ${validation_status} == "failed" ]]; then
-        errors_found=1
-        errors[${snapshot}]=${validation_status}
-      fi
-    done
+    echo "Validation status for snapshot ${snapshot}: ${validation_status}"
+    if [[ ${validation_status} == "not_validated" ]] || [[ ${validation_status} == "in_progress" ]]; then
+      status="not_validated"
+    elif [[ ${validation_status} == "failed" ]]; then
+      errors_found=1
+    fi
     sleep 1
   done
 
   if [[ ${errors_found} -eq 1 ]]; then
-    for snapshot in ${!errors[@]}; do
-      echo "Validation failed for snapshot ${snapshot} with following errors:"
-      policy_url="${sn_instance}/api/now/table/sn_cdm_policy_validation_result?sysparm_query=snapshot.name%3D${snapshot}%5Etype%3Dfailure%5Esnapshot.cdm_application_id.name%3D$2&sysparm_fields=policy.name%2Cdescription%2Cnode_path"
-      policy_response=$(curl -s -X GET ${policy_url} -u ${sn_user}:${sn_password})
-      echo ${policy_response}|jq -r ".result[]"
-    done
+    echo "Validation failed for snapshot ${snapshot} with following errors:"
+    policy_url="${sn_instance}/api/now/table/sn_cdm_policy_validation_result?sysparm_query=snapshot.number%3D${snapshot}%5Etype%3Dfailure&sysparm_fields=policy.name%2Cdescription%2Cnode_path"
+    policy_response=$(curl -s -X GET ${policy_url} -u ${sn_user}:${sn_password})
+    echo ${policy_response}|jq -r ".result[]"
 
     echo "Validation failures, aborting..."
     exit 1
   fi
-
-  echo ${response}
+  echo "Publish status for snapshot ${snapshot}: ${publish_status}"
+  echo "validation=${validation_status}" >> $GITHUB_OUTPUT
+  echo "publish=${publish_status}" >> $GITHUB_OUTPUT
 }
 
 function upload()
@@ -118,6 +112,7 @@ function upload()
 declare sn_instance=$1
 declare sn_user=$2
 declare sn_password=$3
+declare deployable=${14}
 
 target=$5
 target_name=$6
