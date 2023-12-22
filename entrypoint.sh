@@ -40,7 +40,7 @@ function get_snapshot_validation_status()
     status="validated"
     response=$(curl -s -X GET ${request_url} -u ${sn_user}:${sn_password})
     validation_status=$(echo ${response}|jq -r ".result[].validation")
-    snapshot=$(echo ${response}|jq -r ".result[].name")
+    snapshot=$(echo ${response}|jq -r ".result[].number")
     publish_status=$(echo ${response}|jq -r ".result[].published")
 
     echo "Validation status for snapshot ${snapshot}: ${validation_status}"
@@ -54,7 +54,7 @@ function get_snapshot_validation_status()
 
   if [[ ${errors_found} -eq 1 ]]; then
     echo "Validation failed for snapshot ${snapshot} with following errors:"
-    policy_url="${sn_instance}/api/now/table/sn_cdm_policy_validation_result?sysparm_query=snapshot.name%3D${snapshot}%5Etype%3Dfailure&sysparm_fields=policy.name%2Cdescription%2Cnode_path"
+    policy_url="${sn_instance}/api/now/table/sn_cdm_policy_validation_result?sysparm_query=snapshot.number%3D${snapshot}%5Etype%3Dfailure&sysparm_fields=policy.name%2Cdescription%2Cnode_path"
     policy_response=$(curl -s -X GET ${policy_url} -u ${sn_user}:${sn_password})
     echo ${policy_response}|jq -r ".result[]"
 
